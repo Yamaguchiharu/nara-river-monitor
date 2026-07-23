@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="utf-8">
+
+<title>水位グラフ</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body {
+    font-family: sans-serif;
+    margin: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.content {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.graph-panel {
+    flex: 3;
+}
+
+.camera-panel {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+#cameraImage{
+    width:100%;
+}
+
+#links{
+    margin-bottom:15px;
+}
+
+#chart {
+    max-height: 600px;
+}
+
+.camera-panel a {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #1976d2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.camera-panel a:hover {
+    background: #1565c0;
+}
+
+.water-link{
+    color:#1976d2;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.water-link:hover{
+    text-decoration:underline;
+}
+
+.status-card{
+
+    margin-top:15px;
+
+    padding:15px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+    display:flex;
+
+    justify-content:space-around;
+
+    align-items:center;
+
+    gap:20px;
+}
+
+.status-item{
+
+    text-align:center;
+
+    flex:1;
+}
+
+.status-item .label{
+
+    font-size:14px;
+
+    color:#555;
+
+    margin-bottom:5px;
+}
+
+#currentLevel,
+#changeLevel,
+#obsTime{
+
+    font-size:22px;
+
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div style="display:flex; align-items:center; gap:10px;">
+
+    <h2 id="title">読込中...</h2>
+
+    <span id="waterLink"></span>
+
+</div>
+
+<div class="content">
+
+<div class="graph-panel">
+
+    <canvas id="chart"></canvas>
+
+<div id="statusCard" class="status-card">
+
+    <div class="status-item">
+        <div class="label">現在水位</div>
+        <div id="currentLevel"></div>
+    </div>
+
+    <div class="status-item">
+        <div class="label">前10分変化</div>
+        <div id="changeLevel"></div>
+    </div>
+
+    <div class="status-item">
+        <div class="label">観測時刻</div>
+        <div id="obsTime"></div>
+    </div>
+
+</div>
+
+</div>
+
+    <div class="camera-panel">
+
+        <h3>監視カメラ</h3>
+
+        <a
+            id="cameraLink"
+            target="_blank">
+
+            <img
+                id="cameraImage"
+                style="
+                    width:100%;
+                    border:1px solid #ccc;
+                ">
+
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(
+    location.search
+);
+
+const stationCode =
+    params.get("station");
+
+if (!stationCode) {
+
+    document.getElementById("title")
+        .innerText = "stationパラメータがありません";
+
+    throw new Error("station parameter missing");
+}
+
+fetch(`graphs/${stationCode}.json`)
+
+.then(response => response.json())
+
+.then(data => {
+
+document.getElementById("title")
+    .innerHTML = `
+        <div style="font-size:14px;color:#666;">
+            ${data.station_kana}
+        </div>
+
+        <div style="font-size:28px;font-weight:bold;">
+            ${data.station_name}
+        </div>
+
+        <div style="margin-top:5px;">
+            ${data.river_system}
+            /
+            ${data.river_name}
+            (${data.river_kana})
+        </div>
+    `;
+
+document.getElementById("waterLink")
+    .innerHTML = `
+        <a
+   href="${data.water_url}"
+   target="_blank">
+            （川の防災情報のページ）
+        </a>
+    `;
+
+    if(
+        data.camera_url &&
+        data.camera_url !== ""
+    ){
+
+        document.getElementById(
+            "cameraImage"
+        ).src =
+            data.camera_url +
+            "?t=" +
+            Date.now();
+
+        document.getElementById(
+            "cameraLink"
+        ).href =
+            data.camera_url;
+
+    }
+    else{
+
+        document.querySelector(
+            ".camera-panel"
+        ).style.display =
+            "none";
+
+    }
+
+const currentStg =
+    data.history.at(-1).stg;
+
+document.getElementById(
+    "currentLevel"
+).innerText =
+    currentStg == null
+        ? "欠測"
+        : currentStg + " m";
+
+document.getElementById(
+    "obsTime"
+).innerText =
+    data.history.at(-1).obsTime;
+
+    const history =
+        data.history;
+
+    const standbyLevel =
+        parseFloat(data.standby_level);
+
+    const warningLevel =
+        parseFloat(data.warning_level);
+
+    const evacuationLevel =
+        parseFloat(data.evacuation_level);
+
+    const dangerLevel =
+        parseFloat(data.danger_level);
+
+let change = 0;
+
+if(history.length >= 2){
+
+    change =
+        history.at(-1).stg
+        -
+        history.at(-2).stg;
+
+}
+
+let status = 0;
+
+if(currentStg == null){
+
+    status = 9;
+
+}
+else if(
+    !isNaN(dangerLevel) &&
+    history.at(-1).stg >= dangerLevel
+){
+    status = 4;
+}
+else if(
+    !isNaN(evacuationLevel) &&
+    history.at(-1).stg >= evacuationLevel
+){
+    status = 3;
+}
+else if(
+    !isNaN(warningLevel) &&
+    history.at(-1).stg >= warningLevel
+){
+    status = 2;
+}
+else if(
+    !isNaN(standbyLevel) &&
+    history.at(-1).stg >= standbyLevel
+){
+    status = 1;
+}
+
+if(currentStg == null){
+
+    document.getElementById(
+        "statusCard"
+    ).style.backgroundColor =
+        "#eeeeee";
+
+}
+else{
+
+    document.getElementById(
+        "statusCard"
+    ).style.backgroundColor =
+        getStatusColor(status);
+
+}
+
+document.getElementById(
+    "changeLevel"
+).innerText =
+    currentStg == null
+        ? "欠測"
+        : change.toFixed(2) + " m";
+
+    const labels =
+        history.map(x => x.obsTime);
+
+    const values =
+        history.map(x => x.stg);
+
+    const datasets = [
+
+        {
+            label: "水位(m)",
+            data: values,
+            borderColor: "blue",
+            borderWidth: 3,
+            pointRadius: 2,
+            fill: false
+        }
+
+    ];
+
+    if (!isNaN(dangerLevel)) {
+
+        datasets.push({
+            label: "氾濫危険水位",
+            data: labels.map(() => dangerLevel),
+            borderColor: "purple",
+            borderWidth: 4,
+            pointRadius: 0
+        });
+
+    }
+
+    if (!isNaN(evacuationLevel)) {
+
+        datasets.push({
+            label: "避難判断水位",
+            data: labels.map(() => evacuationLevel),
+            borderColor: "red",
+            borderWidth:4,
+            pointRadius: 0
+        });
+
+    }
+
+    if (!isNaN(warningLevel)) {
+
+        datasets.push({
+            label: "氾濫注意水位",
+            data: labels.map(() => warningLevel),
+            borderColor: "yellow",
+            borderWidth: 2,
+            pointRadius: 0
+        });
+
+    }
+
+    if (!isNaN(standbyLevel)) {
+
+        datasets.push({
+            label: "水防団待機水位",
+            data: labels.map(() => standbyLevel),
+            borderColor: "lightgreen",
+            borderWidth: 2,
+            pointRadius: 0
+        });
+
+    }
+
+    new Chart(
+        document.getElementById("chart"),
+        {
+            type: "line",
+
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+
+            options: {
+
+                responsive: true,
+
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+
+                scales: {
+
+                    y: {
+                        title: {
+                            display: true,
+                            text: "水位(m)"
+                        }
+                    },
+
+                    x: {
+                        title: {
+                            display: true,
+                            text: "観測時刻"
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+})
+
+.catch(error => {
+
+    document.getElementById("title")
+        .innerText =
+        "グラフデータの読み込みに失敗しました";
+
+    console.error(error);
+
+});
+
+function getStatusColor(status){
+
+    switch(status){
+
+        case 9:
+            return "#eeeeee";   // 欠測
+
+        case 4:
+            return "#e1bee7";   // 紫
+
+        case 3:
+            return "#ffcdd2";   // 赤
+
+        case 2:
+            return "#fff9c4";   // 黄
+
+        case 1:
+            return "#c8e6c9";   // 黄緑
+
+        default:
+            return "#e3f2fd";   // 青
+    }
+
+}
+
+</script>
+
+</body>
+</html>
