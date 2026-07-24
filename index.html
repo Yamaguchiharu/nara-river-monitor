@@ -869,6 +869,37 @@ document.getElementById(
     }
 );
 
+function scheduleReload() {
+
+    const now = new Date();
+
+    const next = new Date(now);
+
+    let minute =
+        Math.floor(now.getMinutes() / 10) * 10 + 2;
+
+    if (minute <= now.getMinutes()) {
+        minute += 10;
+    }
+
+    next.setMinutes(
+        minute,
+        0,
+        0
+    );
+
+    const delay =
+        next.getTime() - now.getTime();
+
+    setTimeout(
+        () => location.reload(),
+        delay
+    );
+
+}
+
+scheduleReload();
+  
 </script>
 
 <audio id="alarmSound" preload="auto">
