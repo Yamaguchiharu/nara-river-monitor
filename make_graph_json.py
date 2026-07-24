@@ -19,7 +19,7 @@ def get_history(ofc_cd, obs_cd):
 
         target = (
             datetime.now(JST)
-            - timedelta(minutes=10 + offset)
+            - timedelta(minutes=5 + offset)
         )
 
         minute = (
