@@ -18,6 +18,11 @@ jobs:
 
     steps:
 
+      - name: Debug
+        run: |
+          echo "event=${{ github.event_name }}"
+          date
+
       - name: Checkout
         uses: actions/checkout@v4
 
