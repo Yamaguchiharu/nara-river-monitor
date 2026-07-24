@@ -1,7 +1,11 @@
 import requests
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+JST = timezone(
+    timedelta(hours=9)
+)
 
 def get_water_level(ofc_cd, obs_cd):
 
@@ -12,7 +16,7 @@ def get_water_level(ofc_cd, obs_cd):
     for offset in range(0, 30, 10):
 
         target = (
-            datetime.now()
+            datetime.now(JST)
             - timedelta(minutes=20 + offset)
         )
 
