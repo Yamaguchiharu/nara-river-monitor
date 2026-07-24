@@ -7,9 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
-
+  
   update:
-
+  
+    permissions:
+      contents: write
+      
     runs-on: ubuntu-latest
 
     steps:
@@ -44,4 +47,4 @@ jobs:
           git diff --staged --quiet || git commit -m "auto update"
 
       - name: Push
-        run: git push
+        run: git push origin main
