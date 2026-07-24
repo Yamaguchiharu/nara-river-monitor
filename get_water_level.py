@@ -17,7 +17,7 @@ def get_water_level(ofc_cd, obs_cd):
 
         target = (
             datetime.now(JST)
-            - timedelta(minutes=20 + offset)
+            - timedelta(minutes=10 + offset)
         )
 
         minute = (
