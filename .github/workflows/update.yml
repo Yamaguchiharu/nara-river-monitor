@@ -2,7 +2,7 @@ name: Update River Data
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/10 * * * *"
 
   workflow_dispatch:
 
@@ -30,6 +30,11 @@ jobs:
           pip install pandas
           pip install openpyxl
           pip install requests
+
+      - name: Debug trigger
+        run: |
+          echo "event=${{ github.event_name }}"
+          date
 
       - name: Update JSON
         run: |
