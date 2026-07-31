@@ -254,8 +254,53 @@ document.getElementById("waterLink")
 
     }
 
-const currentStg =
-    data.history.at(-1).stg;
+const latest =
+    data.history.at(-1);
+
+const MISSING_CODES = [
+    140,
+    160,
+    190
+];
+
+let currentStg = null;
+let currentObsTime = latest.obsTime;
+
+if(latest.stgCcd === 0){
+
+    currentStg = latest.stg;
+
+}
+else if(
+    MISSING_CODES.includes(
+        latest.stgCcd
+    )
+){
+
+    currentStg = null;
+
+}
+else{
+
+    const previousValid =
+        [...data.history]
+        .slice(0, -1)
+        .reverse()
+        .find(
+            x => x.stgCcd === 0
+        );
+
+    if(previousValid){
+
+        currentStg =
+            previousValid.stg;
+
+        currentObsTime =
+            previousValid.obsTime;
+
+    }
+
+}
 
 document.getElementById(
     "currentLevel"
@@ -267,7 +312,7 @@ document.getElementById(
 document.getElementById(
     "obsTime"
 ).innerText =
-    data.history.at(-1).obsTime;
+    currentObsTime;
 
     const history =
         data.history;
@@ -284,14 +329,19 @@ document.getElementById(
     const dangerLevel =
         parseFloat(data.danger_level);
 
-let change = 0;
+const validHistory =
+    history.filter(
+        x => x.stgCcd === 0
+    );
 
-if(history.length >= 2){
+let change = null;
+
+if(validHistory.length >= 2){
 
     change =
-        history.at(-1).stg
+        validHistory.at(-1).stg
         -
-        history.at(-2).stg;
+        validHistory.at(-2).stg;
 
 }
 
@@ -304,25 +354,25 @@ if(currentStg == null){
 }
 else if(
     !isNaN(dangerLevel) &&
-    history.at(-1).stg >= dangerLevel
+    currentStg >= dangerLevel
 ){
     status = 4;
 }
 else if(
     !isNaN(evacuationLevel) &&
-    history.at(-1).stg >= evacuationLevel
+    currentStg >= evacuationLevel
 ){
     status = 3;
 }
 else if(
     !isNaN(warningLevel) &&
-    history.at(-1).stg >= warningLevel
+    currentStg >= warningLevel
 ){
     status = 2;
 }
 else if(
     !isNaN(standbyLevel) &&
-    history.at(-1).stg >= standbyLevel
+    currentStg >= standbyLevel
 ){
     status = 1;
 }
@@ -349,7 +399,9 @@ document.getElementById(
 ).innerText =
     currentStg == null
         ? "欠測"
-        : change.toFixed(2) + " m";
+        : change == null
+            ? "-"
+            : change.toFixed(2) + " m";
 
     const labels =
         history.map(x => x.obsTime);
