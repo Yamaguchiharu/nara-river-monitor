@@ -168,6 +168,7 @@ def create_station_record(row):
         return {
            "station_code": row["station_code"],
            "station_name": row["station_name"],
+           "region": row["region"],
            "river_system": row["river_system"],
            "river_name": row["river_name"],
            "latitude": row["latitude"],
