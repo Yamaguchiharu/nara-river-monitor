@@ -682,6 +682,7 @@ function renderAlertList(
             card.innerHTML = `
                 <div class="station-title">
                     ${station.station_name}
+                    ${station.river_name}
                     <span style="
                         font-size:12px;
                         color:#666;
@@ -689,7 +690,6 @@ function renderAlertList(
                     ">
                         (${station.region})
                     </span>
-                    ${station.river_name}
                 </div>
 
                 <div>
