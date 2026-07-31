@@ -176,8 +176,14 @@ def create_station_record(row):
            "obs_time": result["obs_time"],
            "change_10m": result["change_10m"],
            "status_level": status_level,
-           "camera_url": row["camera_url"],
-           "water_url": row["water_url"]
+           "camera_url":
+               None
+               if pd.isna(row["camera_url"])
+               else row["camera_url"],
+           "water_url":
+               None
+               if pd.isna(row["water_url"])
+               else row["water_url"],
         }
 
     except Exception as e:
@@ -242,11 +248,12 @@ with open(
     encoding="utf-8"
 ) as f:
 
-    json.dump(
-        result,
-        f,
-        ensure_ascii=False
-    )
+json.dump(
+    result,
+    f,
+    ensure_ascii=False,
+    allow_nan=False
+)
 
 print(df.columns.tolist())
 print("件数:", len(records))
