@@ -7,13 +7,6 @@ JST = timezone(
     timedelta(hours=9)
 )
 
-result = {
-    "updated_at": datetime.now(JST).strftime(
-        "%Y/%m/%d %H:%M"
-    ),
-    "stations": records
-}
-
 def get_water_level(ofc_cd, obs_cd):
 
     headers = {
@@ -234,7 +227,12 @@ records = [
     if r is not None
 ]
 
-result_df = pd.DataFrame(records)
+result = {
+    "updated_at": datetime.now(JST).strftime(
+        "%Y/%m/%d %H:%M"
+    ),
+    "stations": records
+}
 
 import json
 
@@ -251,6 +249,5 @@ with open(
     )
 
 print(df.columns.tolist())
-print(result_df.head())
-print("件数:", len(result_df))
+print("件数:", len(records))
 print("保存完了")
