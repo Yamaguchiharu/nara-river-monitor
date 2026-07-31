@@ -158,10 +158,20 @@ body{
 <body>
 
 <button id="reloadButton">
-    再読み込み
+    リロード
 </button>
 
 <div id="alertToast"></div>
+<div id="updateTime"
+     style="
+        position:absolute;
+        top:10px;
+        right:20px;
+        color:#666;
+        font-size:14px;
+     ">
+</div>
+
 <div class="top-area">
 
     <div class="map-panel">
@@ -396,10 +406,18 @@ fetch(
     Date.now()
 )
 .then(response => response.json())
-.then(data => {
+.then(json => {
 
-    checkNewAlerts(data); //アラーム
-    // 地図描画
+    document.getElementById(
+        "updateTime"
+    ).innerText =
+        "データ取得日時：" +
+        json.updated_at;
+
+    const data =
+        json.stations;
+
+    checkNewAlerts(data);
 
     const stationMarkers = {};
 

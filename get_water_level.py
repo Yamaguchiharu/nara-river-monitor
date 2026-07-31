@@ -7,6 +7,13 @@ JST = timezone(
     timedelta(hours=9)
 )
 
+result = {
+    "updated_at": datetime.now(JST).strftime(
+        "%Y/%m/%d %H:%M"
+    ),
+    "stations": records
+}
+
 def get_water_level(ofc_cd, obs_cd):
 
     headers = {
@@ -229,11 +236,19 @@ records = [
 
 result_df = pd.DataFrame(records)
 
-result_df.to_json(
+import json
+
+with open(
     "latest_water_level.json",
-    orient="records",
-    force_ascii=False
-)
+    "w",
+    encoding="utf-8"
+) as f:
+
+    json.dump(
+        result,
+        f,
+        ensure_ascii=False
+    )
 
 print(df.columns.tolist())
 print(result_df.head())
