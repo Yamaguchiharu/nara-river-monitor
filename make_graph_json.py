@@ -130,6 +130,7 @@ def create_graph_json(row):
         graph_data = {
             "station_code": int(row["station_code"]),
             "river_system": row["river_system"],
+            "region": row["region"],
             "station_name": row["station_name"],
             "station_kana": row["station_kana"],
             "river_name": row["river_name"],
