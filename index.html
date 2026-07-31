@@ -681,7 +681,15 @@ function renderAlertList(
 
             card.innerHTML = `
                 <div class="station-title">
-                    ${station.station_name}　${station.river_name}
+                    ${station.station_name}
+                    <span style="
+                        font-size:12px;
+                        color:#666;
+                        font-weight:normal;
+                    ">
+                        (${station.region})
+                    </span>
+                    ${station.river_name}
                 </div>
 
                 <div>
