@@ -1,12 +1,8 @@
 import os
 import requests
 import pandas as pd
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
-
-JST = timezone(
-    timedelta(hours=9)
-)
 
 def get_history(ofc_cd, obs_cd):
 
@@ -18,8 +14,8 @@ def get_history(ofc_cd, obs_cd):
     for offset in range(0, 30, 10):
 
         target = (
-            datetime.now(JST)
-            - timedelta(minutes=5 + offset)
+            datetime.now()
+            - timedelta(minutes=20 + offset)
         )
 
         minute = (
@@ -101,20 +97,23 @@ def create_graph_json(row):
 
         for item in history:
 
-            records.append({
+           records.append({
 
-                "obsTime": item["obsTime"],
+               "obsTime": item["obsTime"],
 
-                "stg":
-                    item["stg"]
-                    if (
-                        item.get("stgCcd") == 0
-                        and
-                        item.get("stg") is not None
-                    )
-                    else None
+               "stg":
+                   item["stg"]
+                   if (
+                       item.get("stgCcd") == 0
+                       and
+                       item.get("stg") is not None
+                   )
+                   else None,
 
-            })
+               "stgCcd":
+                   item.get("stgCcd")
+
+           })
 
         if len(records) == 0:
             return
