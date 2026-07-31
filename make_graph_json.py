@@ -1,8 +1,17 @@
 import os
 import requests
 import pandas as pd
-from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
+
+from datetime import (
+    datetime,
+    timedelta,
+    timezone
+)
+
+JST = timezone(
+    timedelta(hours=9)
+)
 
 def get_history(ofc_cd, obs_cd):
 
@@ -14,8 +23,8 @@ def get_history(ofc_cd, obs_cd):
     for offset in range(0, 30, 10):
 
         target = (
-            datetime.now()
-            - timedelta(minutes=20 + offset)
+            datetime.now(JST)
+            - timedelta(minutes=5 + offset)
         )
 
         minute = (
