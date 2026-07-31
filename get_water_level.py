@@ -248,12 +248,12 @@ with open(
     encoding="utf-8"
 ) as f:
 
-json.dump(
-    result,
-    f,
-    ensure_ascii=False,
-    allow_nan=False
-)
+    json.dump(
+        result,
+        f,
+        ensure_ascii=False,
+        allow_nan=False
+    )
 
 print(df.columns.tolist())
 print("件数:", len(records))
