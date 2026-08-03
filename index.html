@@ -164,7 +164,24 @@ body{
 </button>
 -->
 
-<div id="alertToast"></div>
+<div id="alertToast">
+
+    <span
+        id="closeToast"
+        style="
+            float:right;
+            cursor:pointer;
+            font-weight:bold;
+            font-size:18px;
+        "
+    >
+        ×
+    </span>
+
+    <div id="alertToastContent"></div>
+
+</div>
+  
 <div id="updateTime"
      style="
         position:absolute;
@@ -235,8 +252,24 @@ function showAlertToast(message){
             "alertToast"
         );
 
-    toast.innerHTML =
+    document.getElementById(
+        "alertToastContent"
+    ).innerHTML =
         `<b>新規超過</b><br><br>${message}`;
+
+    document.getElementById(
+        "closeToast"
+    ).addEventListener(
+        "click",
+        () => {
+
+            document.getElementById(
+                "alertToast"
+            ).style.display =
+                "none";
+
+        }
+    );
 
     toast.style.display =
         "block";
@@ -247,16 +280,6 @@ function showAlertToast(message){
         );
 
     sound.play().catch(() => {});
-
-    setTimeout(
-        () => {
-
-            toast.style.display =
-                "none";
-
-        },
-        15000
-    );
 
 }
 
@@ -946,9 +969,11 @@ function scheduleReload() {
 scheduleReload();
   
 </script>
-
+<button onclick="document.getElementById('alarmSound').play()">
+    音声テスト
+</button>
 <audio id="alarmSound" preload="auto">
-    alarm.mp3
+    <source src="alarm.mp3" type="audio/mpeg">
 </audio>
 
 </body>
