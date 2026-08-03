@@ -686,7 +686,19 @@ function renderAlertList(
 
             card.innerHTML = `
                 <div class="station-title">
+
+                    <a
+                        href="graph.html?station=${station.station_code}"
+                        target="_blank"
+                        onclick="event.stopPropagation();"
+                        style="
+                            color:#1976d2;
+                            text-decoration:none;
+                        "
+                    >
                     ${station.station_name}
+                    </a>
+                    </div>
                     ${station.river_name}
                     <span style="
                         font-size:12px;
