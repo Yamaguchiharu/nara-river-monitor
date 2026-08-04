@@ -400,14 +400,43 @@ else{
 
 }
 
+let changeText = "欠測";
+
+if(currentStg != null){
+
+    if(change == null){
+
+        changeText = "-";
+
+    }else{
+
+        let arrow = "→";
+        let color = "black";
+
+        if(change > 0){
+
+            arrow = "↑";
+            color = "red";
+
+        }else if(change < 0){
+
+            arrow = "↓";
+            color = "blue";
+
+        }
+
+        changeText =
+            `${change.toFixed(2)} m ` +
+            `<span style="color:${color};font-weight:bold;">${arrow}</span>`;
+
+    }
+
+}
+
 document.getElementById(
     "changeLevel"
-).innerText =
-    currentStg == null
-        ? "欠測"
-        : change == null
-            ? "-"
-            : change.toFixed(2) + " m";
+).innerHTML =
+    changeText;
 
     const labels =
         history.map(x => x.obsTime);
