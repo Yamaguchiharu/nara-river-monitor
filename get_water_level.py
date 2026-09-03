@@ -165,6 +165,16 @@ def create_station_record(row):
             row["danger_level"]
         )
 
+        if row["station_name"] == "瓦口":
+            print(
+                result["water_level"],
+                row["standby_level"],
+                row["warning_level"],
+                row["evacuation_level"],
+                row["danger_level"],
+                status_level
+            )
+
         return {
            "station_code": row["station_code"],
            "station_name": row["station_name"],
@@ -213,6 +223,14 @@ level_cols = [
 ]
 
 for col in level_cols:
+
+    df[col] = (
+        df[col]
+        .astype(str)
+        .str.replace("\u00A0", "", regex=False)
+        .str.strip()
+    )
+
     df[col] = pd.to_numeric(
         df[col],
         errors="coerce"
